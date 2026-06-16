@@ -1,0 +1,186 @@
+name: sync-kiddin9_submodule_update
+
+on:
+  # 手动触发：允许在网页上手动触发
+  workflow_dispatch:
+
+env:
+  # 东八区
+  TZ: Asia/Shanghai
+
+permissions:
+  # 允许推送和强制推送
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}   # 用有 workflows 权限的 PAT
+
+      - name: 配置 Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # ========== 同步跟踪分支（完全与上游一致） ==========
+      - name: 同步跟踪分支到上游
+        run: |
+          UPSTREAM_URL="${{ vars.UPSTREAM_URL }}"
+          UPSTREAM_BRANCH="${{ vars.UPSTREAM_BRANCH }}"
+          if [ -z "$UPSTREAM_URL" ] || [ -z "$UPSTREAM_BRANCH" ]; then
+            echo "❌ 请先配置变量 UPSTREAM_URL 和 UPSTREAM_BRANCH"
+            exit 1
+          fi
+
+          git remote add upstream "$UPSTREAM_URL" || true
+          git fetch upstream
+
+          # 强制重置到上游（此时本地 master 与上游一致）
+          git checkout -B "$UPSTREAM_BRANCH" "upstream/$UPSTREAM_BRANCH"
+          git push origin "$UPSTREAM_BRANCH" --force-with-lease
+          echo "✅ 跟踪分支已与上游完全同步"
+
+      # ========== 变基 packages 到跟踪分支（保护自己的 .github） ==========
+      - name: 变基 packages 到跟踪分支
+        id: rebase_packages
+        run: |
+          UPSTREAM_BRANCH="${{ vars.UPSTREAM_BRANCH }}"
+
+          # 检出 packages 分支
+          git fetch origin packages
+          git checkout -B packages origin/packages 2>/dev/null || {
+            echo "未检测到远程 packages 分支，跳过"
+            echo "STATUS=no_branch" >> $GITHUB_OUTPUT
+            exit 0
+          }
+
+          # 🔑 在变基之前备份 packages 分支自己的 .github 目录
+          if [ -d .github ]; then
+            cp -r .github /tmp/github_backup
+            echo "已备份 .github 目录"
+          fi
+
+          BEFORE_REBASE=$(git rev-parse HEAD)
+
+          # 变基到上游跟踪分支
+          if git rebase "$UPSTREAM_BRANCH"; then
+            AFTER_REBASE=$(git rev-parse HEAD)
+
+            # 删除上游带来的 .github 目录（如果有）
+            if [ -d .github ]; then
+              rm -rf .github
+            fi
+
+            # 恢复自己备份的 .github 目录
+            if [ -d /tmp/github_backup ]; then
+              cp -r /tmp/github_backup .github
+              rm -rf /tmp/github_backup
+
+              git add .github
+              if ! git diff --cached --quiet; then
+                git commit -m "swlplay $(date '+%Y-%m-%d %H:%M:%S') Keep own .github workflow files [skip ci]"
+              fi
+            fi
+
+            # 如果变基后有实质更新，则推送
+            if [ "$BEFORE_REBASE" != "$AFTER_REBASE" ]; then
+              git push origin packages --force-with-lease
+              echo "✅ packages 变基成功，已推送新提交"
+              echo "STATUS=success" >> $GITHUB_OUTPUT
+            else
+              echo "ℹ️ packages 已是最新，无新提交"
+              echo "STATUS=up-to-date" >> $GITHUB_OUTPUT
+            fi
+          else
+            # 变基冲突，清理备份并中止
+            rm -rf /tmp/github_backup 2>/dev/null || true
+            git rebase --abort
+            echo "⚠️ 变基冲突"
+            echo "STATUS=conflict" >> $GITHUB_OUTPUT
+          fi
+
+      # ========== 冲突时创建 PR（按文件独立版 - 最终可靠版）==========
+      - name: 冲突处理 - 创建 PR
+        if: steps.rebase_packages.outputs.STATUS == 'conflict'
+        run: |
+          UPSTREAM_BRANCH="${{ vars.UPSTREAM_BRANCH }}"
+          git fetch origin packages
+          git checkout -B packages origin/packages
+
+          # 检测冲突文件列表（排除 .github 目录）
+          git merge "$UPSTREAM_BRANCH" --no-commit --no-ff || true
+          CURRENT_CONFLICT_FILES=$(git diff --name-only --diff-filter=U 2>/dev/null | grep -v '^.github/' | sort)
+          git merge --abort 2>/dev/null || git reset --hard HEAD 2>/dev/null || true
+
+          if [ -z "$CURRENT_CONFLICT_FILES" ]; then
+            echo "ℹ️ 无有效冲突（或全部位于 .github 目录）"
+            exit 0
+          fi
+
+          # 收集已存在 PR 中的冲突文件，避免重复创建
+          declare -A EXISTING_PR_FILES
+          EXISTING_PR_NUMBERS=$(gh pr list --base packages --state open --label conflict --json number --jq '.[].number' 2>/dev/null)
+          for PR_NUM in $EXISTING_PR_NUMBERS; do
+            PR_FILES=$(gh pr diff $PR_NUM --name-only 2>/dev/null)
+            for f in $PR_FILES; do
+              EXISTING_PR_FILES["$f"]=1
+            done
+          done
+
+          CREATED_ANY="no"
+          for CONFLICT_FILE in $CURRENT_CONFLICT_FILES; do
+            if [ -n "${EXISTING_PR_FILES[$CONFLICT_FILE]}" ]; then
+              echo "ℹ️ 文件 $CONFLICT_FILE 已在已有 PR 中，跳过"
+              continue
+            fi
+
+            SAFE_NAME=$(echo "$CONFLICT_FILE" | tr '/' '_')
+            CONFLICT_BRANCH="conflict/${SAFE_NAME}-$(date +%Y%m%d-%H%M%S)"
+            git checkout -b "$CONFLICT_BRANCH" packages
+
+            # 直接从跟踪分支取出该文件的最新版本
+            git checkout "$UPSTREAM_BRANCH" -- "$CONFLICT_FILE"
+            git add "$CONFLICT_FILE"
+            git commit -m "⚠️ 冲突: $CONFLICT_FILE"
+
+            git push origin "$CONFLICT_BRANCH"
+
+            gh label create conflict --color "d73f4f" --description "自动合并冲突" 2>/dev/null || true
+            if gh label list | grep -qw conflict; then
+                gh pr create \
+                  --base packages \
+                  --head "$CONFLICT_BRANCH" \
+                  --title "⚠️ 冲突: $CONFLICT_FILE" \
+                  --body "## 🔴 文件冲突
+            文件 \`$CONFLICT_FILE\` 的上游 \`$UPSTREAM_BRANCH\` 和 \`packages\` 分支出现冲突，请手动解决。
+
+            > 此 PR 由 GitHub Actions 自动创建。" \
+                  --label "conflict"
+            else
+                gh pr create \
+                  --base packages \
+                  --head "$CONFLICT_BRANCH" \
+                  --title "⚠️ 冲突: $CONFLICT_FILE" \
+                  --body "## 🔴 文件冲突
+            文件 \`$CONFLICT_FILE\` 的上游 \`$UPSTREAM_BRANCH\` 和 \`packages\` 分支出现冲突，请手动解决。
+
+            > 此 PR 由 GitHub Actions 自动创建。"
+            fi
+
+            git checkout packages
+            CREATED_ANY="yes"
+          done
+
+          if [ "$CREATED_ANY" = "no" ]; then
+            echo "ℹ️ 所有当前冲突文件已在已有 PR 中，跳过"
+          fi
+        env:
+          # 优先使用个人令牌，避免权限问题
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}

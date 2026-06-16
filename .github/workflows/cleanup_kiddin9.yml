@@ -1,0 +1,21 @@
+name: cleanup old workflow runs for kiddin9
+
+on:
+  # 手动触发：允许在网页上手动触发
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 删除旧的工作流运行记录
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          keep_minimum_runs: 0
+          retain_days: 7
