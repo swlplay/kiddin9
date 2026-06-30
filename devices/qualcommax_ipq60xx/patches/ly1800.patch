@@ -19,7 +19,7 @@ diff --git a/package/firmware/ipq-wifi/Makefile b/package/firmware/ipq-wifi/Make
 index 6957f0e4f4da54..abec845eb6f4d1 100644
 --- a/package/firmware/ipq-wifi/Makefile
 +++ b/package/firmware/ipq-wifi/Makefile
-@@ -84,6 +84,7 @@ ALLWIFIBOARDS:= \
+@@ -81,6 +81,7 @@ ALLWIFIBOARDS:= \
  	netgear_wax610y \
  	netgear_wax620 \
  	netgear_wax630 \
@@ -27,7 +27,7 @@ index 6957f0e4f4da54..abec845eb6f4d1 100644
  	prpl_haze \
  	qihoo_360v6 \
  	qnap_301w \
-@@ -287,6 +288,7 @@ $(eval $(call generate-ipq-wifi-package,netgear_wax610,Netgear WAX610))
+@@ -288,6 +289,7 @@ $(eval $(call generate-ipq-wifi-package,netgear_wax610,Netgear WAX610))
  $(eval $(call generate-ipq-wifi-package,netgear_wax610y,Netgear WAX610Y))
  $(eval $(call generate-ipq-wifi-package,netgear_wax620,Netgear WAX620))
  $(eval $(call generate-ipq-wifi-package,netgear_wax630,Netgear WAX630))
@@ -63,26 +63,26 @@ diff --git a/target/linux/qualcommax/ipq60xx/base-files/etc/board.d/02_network b
 index b83fad17b6cc9a..68dc69aeb736ed 100644
 --- a/target/linux/qualcommax/ipq60xx/base-files/etc/board.d/02_network
 +++ b/target/linux/qualcommax/ipq60xx/base-files/etc/board.d/02_network
-@@ -14,6 +14,7 @@ ipq60xx_setup_interfaces()
- 	cmiot,ax18|\
- 	jdcloud,re-cs-07|\
+@@ -35,6 +35,7 @@ ipq60xx_setup_interfaces()
+ 		;;
  	jdcloud,re-ss-01|\
+ 	jdcloud,re-cs-07|\
 +	philips,ly1800|\
- 	qihoo,360v6|\
- 	redmi,ax5-*|\
- 	xiaomi,rm1800)
+ 	anysafe,e1|\
+ 	cmiot,ax18|\
+ 	redmi,ax5|\
 diff --git a/target/linux/qualcommax/ipq60xx/base-files/etc/hotplug.d/firmware/11-ath11k-caldata b/target/linux/qualcommax/ipq60xx/base-files/etc/hotplug.d/firmware/11-ath11k-caldata
 index de70df08aa6c31..9b5d1906f9edd0 100644
 --- a/target/linux/qualcommax/ipq60xx/base-files/etc/hotplug.d/firmware/11-ath11k-caldata
 +++ b/target/linux/qualcommax/ipq60xx/base-files/etc/hotplug.d/firmware/11-ath11k-caldata
-@@ -14,6 +14,7 @@ case "$FIRMWARE" in
- 	glinet,gl-ax1800|\
- 	glinet,gl-axt1800|\
- 	linksys,mr7350|\
+@@ -27,6 +27,7 @@ case "$FIRMWARE" in
+ 	netgear,wax214|\
+ 	netgear,wax610|\
+ 	netgear,wax610y|\
 +	philips,ly1800|\
  	qihoo,360v6|\
- 	xiaomi,rm1800)
- 		caldata_extract "0:art" 0x1000 0x10000
+ 	redmi,ax5|\
+ 	xiaomi,ax1800|\
 diff --git a/target/linux/qualcommax/ipq60xx/base-files/lib/upgrade/platform.sh b/target/linux/qualcommax/ipq60xx/base-files/lib/upgrade/platform.sh
 index 22ea86a35677fa..d8ef0afe547707 100644
 --- a/target/linux/qualcommax/ipq60xx/base-files/lib/upgrade/platform.sh
