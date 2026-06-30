@@ -29,29 +29,19 @@
  	arcadyan,mozart)
  		ucidef_set_interfaces_lan_wan "lan0 eth1" eth2
  		;;
-@@ -46,17 +54,21 @@ mediatek_setup_interfaces()
+@@ -46,7 +46,11 @@ mediatek_setup_interfaces()
  	asus,zenwifi-bt8|\
  	asus,zenwifi-bt8-ubootmod|\
  	cetron,ct3003|\
 -	cmcc,a10-stock|\
 +	cmcc,a10|\
- 	cmcc,a10-ubootmod|\
- 	confiabits,mt7981|\
- 	creatlentem,clt-r30b1|\
- 	creatlentem,clt-r30b1-112m|\
- 	cudy,wr3000-v1|\
 +	ikuai,q3000|\
- 	jcg,q30-pro|\
- 	keenetic,kn-3711|\
- 	keenetic,kn-3811|\
- 	netis,nx32u|\
- 	qihoo,360t7|\
 +	philips,hy3000|\
 +	sl,3000*|\
 +	bt,r320|\
- 	routerich,ax3000|\
- 	routerich,ax3000-ubootmod|\
- 	routerich,be7200|\
+ 	cmcc,a10-ubootmod|\
+ 	confiabits,mt7981|\
+ 	creatlentem,clt-r30b1|\
 @@ -70,6 +82,7 @@ mediatek_setup_interfaces()
  	mediatek,mt7981-rfb|\
  	netcore,n60|\

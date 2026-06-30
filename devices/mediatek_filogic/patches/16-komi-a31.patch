@@ -28,16 +28,16 @@
  	nradio,c8-668gl)
  		hw_mac_addr=$(mmc_get_mac_ascii bdinfo "fac_mac ")
  		[ "$PHYNBR" = "0" ] && echo "$hw_mac_addr" > /sys${DEVPATH}/macaddress
-@@ -227,6 +234,26 @@ case "$board" in
- 	tplink,tl-xtr8488)
- 		[ "$PHYNBR" = "1" ] && get_mac_label > /sys${DEVPATH}/macaddress
+@@ -262,4 +262,24 @@ case "$board" in
+ 		addr=$(mtd_get_mac_binary factory 0x04)
+ 		[ "$PHYNBR" = "1" ] && macaddr_setbit_la $(macaddr_add $addr -0x300000) > /sys${DEVPATH}/macaddress
  		;;
-+        umi,uax3000e)
++    umi,uax3000e)
 +		addr=$(mmc_get_mac_binary factory 0x24)
 +		[ "$PHYNBR" = "0" ] && macaddr_add $addr > /sys${DEVPATH}/macaddress
 +		[ "$PHYNBR" = "1" ] && macaddr_add $addr 1 > /sys${DEVPATH}/macaddress
 +		;;
-+        newland,nl-wr8103)
++    newland,nl-wr8103)
 +		addr=$(mtd_get_mac_binary Factory 0x0A)
 +		[ "$PHYNBR" = "0" ] && macaddr_add $addr > /sys${DEVPATH}/macaddress
 +		[ "$PHYNBR" = "1" ] && macaddr_add $addr 1 > /sys${DEVPATH}/macaddress
@@ -52,6 +52,4 @@
 +		[ "$PHYNBR" = "0" ] && macaddr_add $label_mac 1 > /sys${DEVPATH}/macaddress
 +		[ "$PHYNBR" = "1" ] && macaddr_add $label_mac 2 > /sys${DEVPATH}/macaddress
 +		;;
- 	routerich,ax3000|\
- 	routerich,ax3000-ubootmod|\
- 	zbtlink,zbt-z8102ax|\
+ esac
