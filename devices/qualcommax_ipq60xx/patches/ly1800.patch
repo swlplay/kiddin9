@@ -39,9 +39,9 @@ diff --git a/target/linux/qualcommax/image/ipq60xx.mk b/target/linux/qualcommax/
 index df69b2d9e60567..67eee6f6ad1750 100644
 --- a/target/linux/qualcommax/image/ipq60xx.mk
 +++ b/target/linux/qualcommax/image/ipq60xx.mk
-@@ -131,6 +131,19 @@ define Device/linksys_mr7350
+@@ -204,6 +204,19 @@ define Device/netgear_wax610y
  endef
- TARGET_DEVICES += linksys_mr7350
+ TARGET_DEVICES += netgear_wax610y
  
 +define Device/philips_ly1800
 +	$(call Device/FitImage)
