@@ -10,6 +10,7 @@ git_clone_path main-nss https://github.com/LiBwrt/openwrt-6.x target/linux/gener
 
 wget -N https://github.com/LiBwrt/main-nss/raw/refs/heads/main-nss/include/image-commands.mk -P include/
 wget -N https://github.com/LiBwrt/main-nss/raw/refs/heads/main-nss/config/Config-ipq.in -P config/
+wget -N https://github.com/LiBwrt/main-nss/raw/refs/heads/main-nss/config/Config-kernel.in -P config/
 wget -N https://github.com/LiBwrt/main-nss/raw/refs/heads/main-nss/Config.in -P ./
 
 rm -rf feeds/kiddin9/shortcut-fe
