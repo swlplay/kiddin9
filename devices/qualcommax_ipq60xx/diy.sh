@@ -8,10 +8,9 @@ rm -rf package/boot package/firmware/ipq-wifi target/linux/generic target/linux/
 
 git_clone_path main-nss https://github.com/LiBwrt/openwrt-6.x target/linux/generic target/linux/qualcommax package/boot package/firmware/ipq-wifi package/firmware/ath11k-firmware package/kernel/mac80211 package/kernel/nat46
 
-wget -N https://github.com/LiBwrt/main-nss/raw/refs/heads/main-nss/include/image-commands.mk -P include/
-wget -N https://github.com/LiBwrt/main-nss/raw/refs/heads/main-nss/config/Config-ipq.in -P config/
-wget -N https://github.com/LiBwrt/main-nss/raw/refs/heads/main-nss/config/Config-kernel.in -P config/
-wget -N https://github.com/LiBwrt/main-nss/raw/refs/heads/main-nss/Config.in -P ./
+wget -N https://github.com/LiBwrt/LibWrt/raw/refs/heads/main-nss/include/image-commands.mk -P include/
+wget -N https://github.com/LiBwrt/LibWrt/raw/refs/heads/main-nss/config/Config-ipq.in -P config/
+wget -N https://github.com/LiBwrt/LibWrt/raw/refs/heads/main-nss/Config.in -P ./
 
 rm -rf feeds/kiddin9/shortcut-fe
 
