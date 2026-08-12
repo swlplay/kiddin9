@@ -398,7 +398,6 @@
  define Device/routerich_ax3000
    DEVICE_VENDOR := Routerich
    DEVICE_MODEL := AX3000
- 
 @@ -2762,17 +2701,8 @@ define Device/tplink_tl-xdr-common
    BLOCKSIZE := 128k
    PAGESIZE := 2048
