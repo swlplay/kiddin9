@@ -48,7 +48,7 @@
  endef
  TARGET_DEVICES += abt_asr3000
  
-@@ -835,21 +828,21 @@ define Device/cetron_ct3003
+@@ -839,21 +832,21 @@ define Device/cetron_ct3003
  endef
  TARGET_DEVICES += cetron_ct3003
  
@@ -76,7 +76,7 @@
    KERNEL_IN_UBI := 1
    IMAGES += factory.bin
    IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
-@@ -859,7 +852,7 @@ define Device/cmcc_a10-stock
+@@ -863,7 +856,7 @@ define Device/cmcc_a10-stock
    KERNEL_INITRAMFS = kernel-bin | lzma | \
  	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
  endef
@@ -85,7 +85,7 @@
  
  define Device/cmcc_a10-ubootmod
    DEVICE_VENDOR := CMCC
-@@ -929,7 +922,6 @@ define Device/cmcc_rax3000m
+@@ -933,7 +926,6 @@ define Device/cmcc_rax3000m
    ARTIFACT/nand-ddr4-bl31-uboot.fip := mt7981-bl31-uboot cmcc_rax3000m-nand-ddr4
    ARTIFACT/nand-ddr4-preloader.bin  := mt7981-bl2 spim-nand-ddr4
  endef
@@ -93,7 +93,7 @@
  
  define Device/comfast_cf-e393ax
    DEVICE_VENDOR := COMFAST
-@@ -970,7 +962,7 @@ endef
+@@ -974,7 +966,7 @@ endef
  
  define Device/comfast_cf-wr632ax
    DEVICE_DTS := mt7981b-comfast-cf-wr632ax
@@ -102,7 +102,7 @@
    IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
    SUPPORTED_DEVICES += cf-wr632ax
    $(call Device/comfast_cf-wr632ax-common)
-@@ -1175,30 +1167,20 @@ define Device/cudy_tr3000-v1
+@@ -1273,30 +1265,20 @@ define Device/cudy_tr3000-v1
  endef
  TARGET_DEVICES += cudy_tr3000-v1
  
@@ -138,7 +138,7 @@
  
  define Device/cudy_wr3000-v1
    DEVICE_VENDOR := Cudy
-@@ -1411,7 +1393,7 @@ define Device/gatonetworks_gdsp
+@@ -1646,7 +1628,7 @@ define Device/gatonetworks_gdsp
    DEVICE_DTC_FLAGS := --pad 4096
    IMAGES := sysupgrade.itb
    IMAGE_SIZE := 32768k
@@ -147,7 +147,29 @@
      kmod-mt7915e kmod-mt7981-firmware \
      kmod-usb-net-qmi-wwan kmod-usb-serial-option kmod-usb3 \
      mt7981-wo-firmware
-@@ -1530,19 +1512,11 @@ define Device/h3c_magic-nx30-pro
+@@ -1783,20 +1765,11 @@ define Device/globitel_bt-r320
+   DEVICE_DTS := mt7981b-globitel-bt-r320
+   DEVICE_DTS_DIR := ../dts
+   DEVICE_PACKAGES := kmod-usb3 kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware f2fsck mkf2fs
+-  KERNEL_LOADADDR := 0x44000000
+   KERNEL := kernel-bin | lzma
+   KERNEL_INITRAMFS := kernel-bin | lzma | \
+ 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+   KERNEL_INITRAMFS_SUFFIX := -recovery.itb
+-  IMAGES := sysupgrade.itb
+-  IMAGE_SIZE := $$(shell expr 64 + $$(CONFIG_TARGET_ROOTFS_PARTSIZE))m
+-  IMAGE/sysupgrade.itb := append-kernel | \
+-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
+-	pad-rootfs | append-metadata
+-  ARTIFACTS := gpt.bin preloader.bin bl31-uboot.fip
+-  ARTIFACT/gpt.bin := mt798x-gpt emmc
+-  ARTIFACT/preloader.bin := mt7981-bl2 emmc-ddr4
+-  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot globitel_bt-r320
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+ endef
+ TARGET_DEVICES += globitel_bt-r320
+ 
+@@ -1809,19 +1782,11 @@ define Device/h3c_magic-nx30-pro
    BLOCKSIZE := 128k
    PAGESIZE := 2048
    KERNEL_IN_UBI := 1
@@ -170,7 +192,7 @@
  endef
  TARGET_DEVICES += h3c_magic-nx30-pro
  
-@@ -1703,45 +1677,23 @@ define Device/jcg_q30-pro
+@@ -2025,45 +1990,23 @@ define Device/jcg_q30-pro
    UBINIZE_OPTS := -E 5
    BLOCKSIZE := 128k
    PAGESIZE := 2048
@@ -223,7 +245,7 @@
  endef
  TARGET_DEVICES += jdcloud_re-cp-03
  
-@@ -1859,18 +1811,14 @@ define Device/konka_komi-a31
+@@ -2222,18 +2165,14 @@ define Device/konka_komi-a31
    UBINIZE_OPTS := -E 5
    BLOCKSIZE := 128k
    PAGESIZE := 2048
@@ -246,7 +268,7 @@
  endef
  TARGET_DEVICES += konka_komi-a31
  
-@@ -2161,18 +2109,11 @@ define Device/netcore_n60
+@@ -2535,18 +2474,11 @@ define Device/netcore_n60
    BLOCKSIZE := 128k
    PAGESIZE := 2048
    KERNEL_IN_UBI := 1
@@ -269,7 +291,7 @@
  endef
  TARGET_DEVICES += netcore_n60
  
-@@ -2185,18 +2126,11 @@ define Device/netcore_n60-pro
+@@ -2559,18 +2491,11 @@ define Device/netcore_n60-pro
    BLOCKSIZE := 128k
    PAGESIZE := 2048
    KERNEL_IN_UBI := 1
@@ -292,7 +314,7 @@
  endef
  TARGET_DEVICES += netcore_n60-pro
  
-@@ -2361,20 +2295,32 @@ define Device/nokia_ea0326gmp
+@@ -2798,20 +2723,32 @@ define Device/nokia_ea0326gmp
    BLOCKSIZE := 128k
    PAGESIZE := 2048
    KERNEL_IN_UBI := 1
@@ -336,16 +358,12 @@
  define Device/nradio_c8-668gl
    DEVICE_VENDOR := NRadio
    DEVICE_MODEL := C8-668GL
-@@ -2463,7 +2409,7 @@ define Device/openwrt_one
+@@ -2900,49 +2837,27 @@ define Device/openwrt_one
    UBINIZE_PARTS := fip=:$(STAGING_DIR_IMAGE)/mt7981_openwrt_one-snand-u-boot.fip \
  		   $(if $(IB),recovery=:$(STAGING_DIR_IMAGE)/mediatek-filogic-openwrt_one-initramfs.itb,\
  			      recovery=:$(KDIR)/tmp/$$(KERNEL_INITRAMFS_IMAGE)) \
 -		   $(if $(wildcard $(TOPDIR)/openwrt-mediatek-filogic-openwrt_one-calibration.itb), calibration=:$(TOPDIR)/openwrt-mediatek-filogic-openwrt_one-calibration.itb)
 +		   $(if $(wildcard $(TOPDIR)/kwrt-mediatek-filogic-openwrt_one-calibration.itb), calibration=:$(TOPDIR)/kwrt-mediatek-filogic-openwrt_one-calibration.itb)
- endef
- TARGET_DEVICES += openwrt_one
- 
-@@ -2778,45 +2778,23 @@ define Device/openwrt_one
  endef
  TARGET_DEVICES += openwrt_one
  
@@ -398,8 +416,7 @@
  define Device/routerich_ax3000
    DEVICE_VENDOR := Routerich
    DEVICE_MODEL := AX3000
- 
-@@ -2762,17 +2701,8 @@ define Device/tplink_tl-xdr-common
+@@ -3253,17 +3168,8 @@ define Device/tplink_tl-xdr-common
    BLOCKSIZE := 128k
    PAGESIZE := 2048
    KERNEL_IN_UBI := 1
@@ -419,7 +436,7 @@
  endef
  
  define Device/tplink_tl-xdr4288
-@@ -2989,14 +2919,18 @@ endif
+@@ -3518,14 +3424,18 @@ endif
  endef
  TARGET_DEVICES += xiaomi_mi-router-ax3000t-ubootmod
  
@@ -441,7 +458,7 @@
    DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
  ifeq ($(IB),)
  ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
-@@ -3006,7 +2940,7 @@ endif
+@@ -3535,7 +3445,7 @@ endif
  endif
    IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
  endef
@@ -450,7 +467,7 @@
  
  define Device/xiaomi_mi-router-wr30u-ubootmod
    DEVICE_VENDOR := Xiaomi
-@@ -3087,6 +3021,23 @@ endif
+@@ -3616,6 +3526,23 @@ endif
  endef
  TARGET_DEVICES += xiaomi_redmi-router-ax6000-ubootmod
  
@@ -474,7 +491,7 @@
  define Device/yuncore_ax835
    DEVICE_VENDOR := YunCore
    DEVICE_MODEL := AX835
-@@ -3269,3 +3220,237 @@ define Device/zyxel_wx5600-t0-ubootmod
+@@ -3866,3 +3793,224 @@ ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
  endif
  endef
  TARGET_DEVICES += zyxel_wx5600-t0-ubootmod
@@ -505,19 +522,6 @@
 +  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 +endef
 +TARGET_DEVICES += sl_3000-emmc
-+
-+define Device/bt_r320
-+  DEVICE_VENDOR := Globitel
-+  DEVICE_MODEL := BT-R320
-+  DEVICE_DTS := mt7981b-bt-r320
-+  DEVICE_DTS_DIR := ../dts
-+  DEVICE_PACKAGES := kmod-usb3 kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware e2fsprogs f2fsck mkf2fs
-+  KERNEL := kernel-bin | lzma | fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
-+  KERNEL_INITRAMFS := kernel-bin | lzma | \
-+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
-+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-+endef
-+TARGET_DEVICES += bt_r320
 +
 +define Device/newland_nl-wr8103
 +  DEVICE_VENDOR := Newland
@@ -712,3 +716,4 @@
 +  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 +endef
 +TARGET_DEVICES += aigo_ags21
+
